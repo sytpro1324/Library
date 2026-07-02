@@ -1,0 +1,1095 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>مكتبة الكتب</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Cairo', sans-serif; }
+        body { background: #0a0a1a; color: #e8e8f0; min-height: 100vh; padding: 20px; }
+        .container { max-width: 1400px; margin: 0 auto; }
+       
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+            padding: 18px 32px;
+            background: rgba(255, 255, 255, 0.04);
+            backdrop-filter: blur(20px);
+            border-radius: 50px;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            margin-bottom: 40px;
+        }
+       
+        .logo {
+            font-size: 28px;
+            font-weight: 800;
+            background: linear-gradient(135deg, #f7d794, #f5a97f, #c39bd3);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+       
+        .search-box {
+            display: flex;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.06);
+            border-radius: 60px;
+            padding: 6px 20px;
+            flex: 1 1 300px;
+        }
+       
+        .search-box input {
+            background: transparent;
+            border: none;
+            padding: 14px 12px;
+            width: 100%;
+            font-size: 16px;
+            color: #fff;
+            outline: none;
+            font-family: 'Cairo', sans-serif;
+        }
+       
+        .search-box input::placeholder { color: #7a7a9a; }
+        .search-box button {
+            background: none;
+            border: none;
+            color: #9a9abf;
+            font-size: 20px;
+            cursor: pointer;
+            padding: 8px;
+        }
+        .search-box button:hover { color: #c39bd3; }
+       
+        .filter-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 30px;
+            justify-content: center;
+        }
+       
+        .filter-tag {
+            padding: 8px 20px;
+            border-radius: 30px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            color: #9a9abf;
+            cursor: pointer;
+            transition: 0.3s;
+            font-size: 14px;
+        }
+       
+        .filter-tag:hover,
+        .filter-tag.active {
+            background: rgba(195, 155, 211, 0.15);
+            color: #fff;
+            border-color: rgba(195, 155, 211, 0.3);
+        }
+       
+        .books-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 28px;
+        }
+       
+        .book-card {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(12px);
+            border-radius: 28px;
+            padding: 22px 20px 24px;
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            transition: all 0.35s ease;
+            display: flex;
+            flex-direction: column;
+        }
+       
+        .book-card:hover {
+            transform: translateY(-8px);
+            border-color: rgba(195, 155, 211, 0.15);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.6);
+            background: rgba(255, 255, 255, 0.05);
+        }
+       
+        .book-cover {
+            width: 100%;
+            aspect-ratio: 2/3;
+            border-radius: 16px;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 64px;
+            background: linear-gradient(145deg, rgba(195, 155, 211, 0.08), rgba(245, 169, 127, 0.05));
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            position: relative;
+            overflow: hidden;
+        }
+       
+        .book-cover img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 16px;
+        }
+       
+        .book-cover .badge {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            background: rgba(195, 155, 211, 0.2);
+            backdrop-filter: blur(8px);
+            padding: 4px 14px;
+            border-radius: 30px;
+            font-size: 11px;
+            font-weight: 700;
+            color: #c39bd3;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            z-index: 2;
+        }
+       
+        .book-cover .book-icon { font-size: 56px; color: #c39bd3; opacity: 0.6; }
+        .book-title { font-size: 18px; font-weight: 700; margin-bottom: 4px; }
+        .book-author { font-size: 14px; color: #9a9abf; margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
+       
+        .book-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 13px;
+            color: #7a7a9a;
+            margin: 10px 0 14px;
+            padding: 8px 0;
+            border-top: 1px solid rgba(255, 255, 255, 0.04);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+            flex-wrap: wrap;
+            gap: 5px;
+        }
+       
+        .btn-group { display: flex; flex-direction: column; gap: 8px; }
+       
+        .btn-download {
+            background: linear-gradient(135deg, #8b5cf6, #6d28d9);
+            border: none;
+            padding: 12px 20px;
+            border-radius: 60px;
+            font-weight: 700;
+            font-size: 15px;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            width: 100%;
+            font-family: 'Cairo', sans-serif;
+        }
+       
+        .btn-download:hover {
+            transform: scale(1.02);
+            background: linear-gradient(135deg, #7c3aed, #5b21b6);
+            box-shadow: 0 12px 40px -8px rgba(139, 92, 246, 0.5);
+        }
+       
+        .stats-bar {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            flex-wrap: wrap;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 30px;
+            margin-bottom: 30px;
+        }
+       
+        .stats-bar .stat { text-align: center; }
+        .stats-bar .stat .number { font-size: 28px; font-weight: 800; color: #c39bd3; }
+        .stats-bar .stat .label { font-size: 14px; color: #7a7a9a; }
+       
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: rgba(20, 20, 40, 0.95);
+            backdrop-filter: blur(20px);
+            padding: 16px 34px;
+            border-radius: 60px;
+            border: 1px solid rgba(195, 155, 211, 0.15);
+            color: #e8e8f0;
+            font-weight: 600;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);
+            transition: all 0.5s cubic-bezier(0.2, 0.9, 0.3, 1.2);
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            font-size: 16px;
+            opacity: 0;
+            visibility: hidden;
+            font-family: 'Cairo', sans-serif;
+        }
+       
+        .toast.show { opacity: 1; visibility: visible; transform: translateX(-50%) translateY(0); }
+        .toast i { font-size: 24px; color: #c39bd3; }
+       
+        .no-results {
+            text-align: center;
+            padding: 60px 20px;
+            color: #7a7a9a;
+            font-size: 20px;
+            grid-column: 1 / -1;
+        }
+       
+        .no-results i { font-size: 60px; color: #3a3a5a; margin-bottom: 20px; display: block; }
+       
+        @media (max-width: 820px) {
+            .header { flex-direction: column; align-items: stretch; border-radius: 30px; padding: 18px 20px; }
+            .logo { text-align: center; }
+            .books-grid { grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 18px; }
+        }
+       
+        @media (max-width: 480px) {
+            .books-grid { grid-template-columns: 1fr 1fr; gap: 14px; }
+            .book-card { padding: 16px 14px 18px; border-radius: 20px; }
+            .book-title { font-size: 15px; }
+            .btn-download { font-size: 12px; padding: 10px 14px; }
+            .stats-bar { gap: 20px; }
+            .stats-bar .stat .number { font-size: 20px; }
+            .filter-tags { gap: 6px; }
+            .filter-tag { font-size: 12px; padding: 5px 14px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header class="header">
+        <div class="logo">📚 مكتبة الكتب</div>
+        <div class="search-box">
+            <input type="text" placeholder="ابحث عن كتاب أو مؤلف..." id="searchInput">
+            <button id="searchBtn"><i class="fas fa-search"></i></button>
+        </div>
+    </header>
+
+    <div class="stats-bar">
+        <div class="stat"><div class="number" id="bookCount">0</div><div class="label">📚 كتب متاحة</div></div>
+        <div class="stat"><div class="number" id="authorCount">0</div><div class="label">✍️ مؤلفين</div></div>
+        <div class="stat"><div class="number">مجاناً</div><div class="label">💫 تحميل مباشر</div></div>
+    </div>
+
+    <div class="filter-tags" id="filterTags">
+        <span class="filter-tag active" data-filter="all">📚 الكل</span>
+        <span class="filter-tag" data-filter="أسامة المسلم">🖋️ أسامة المسلم</span>
+        <span class="filter-tag" data-filter="نجيب محفوظ">🏆 نجيب محفوظ</span>
+        <span class="filter-tag" data-filter="مصطفى محمود">🧠 مصطفى محمود</span>
+        <span class="filter-tag" data-filter="جبران خليل جبران">🌹 جبران</span>
+        <span class="filter-tag" data-filter="عالمية">🌍 عالمية</span>
+        <span class="filter-tag" data-filter="أحمد خالد توفيق">🩸 أحمد خالد توفيق</span>
+        <span class="filter-tag" data-filter="عمرو عبد الحميد">📖 عمرو عبد الحميد</span>
+    </div>
+
+    <div class="books-grid" id="booksGrid"></div>
+</div>
+
+<div class="toast" id="toast">
+    <i class="fas fa-check-circle"></i>
+    <span id="toastMessage">جاري التحميل...</span>
+</div>
+
+<script>
+    (function() {
+        const allBooks = [
+            // ============================================================
+            //  📚 بساتين عربستان - الأجزاء الستة
+            // ============================================================
+            {
+                title: "بساتين عربستان - الجزء الأول",
+                author: "اسامة المسلم",
+                category: "رواية رعب",
+                pages: 350,
+                badge: "الجزء الأول",
+                cover: "https://cdn.salla.sa/qKEyA/aab15f06-97b7-4d82-ac12-9b40e78ed0dd-834.00537634409x1000-Px5NAlG13Ev8cm6xgtt6jp9fCVsZPd1cFNMegStx.png", // ضع رابط الصورة هنا
+                downloadLink: "https://mktbtypdf.com/download?id=1324742"
+            },
+            {
+                title: "بساتين عربستان - الجزء الثاني",
+                author: "اسامة المسلم",
+                category: "رواية فنتازيا",
+                pages: 370,
+                badge: "الجزء الثاني",
+                cover: "https://cdn.salla.sa/lYqDe/6fb5a858-5129-4256-9a55-11f728a8f168-700x1000-70uFhhz48mvz17rzLFnawvB89ONdwNR74ik1BkxO.jpg",
+                downloadLink: "https://mktbtypdf.com/download?id=1324778"
+            },
+            {
+                title: "بساتين عربستان - الجزء الثالث",
+                author: "اسامة المسلم",
+                category: "رواية فنتازيا",
+                pages: 360,
+                badge: "الجزء الثالث",
+                cover: "https://www.ebnalarabe.com/cdn/shop/files/1_d5484b77-bd1f-4657-9962-5035f2888716.webp?v=1725914197",
+                downloadLink: "https://mktbtypdf.com/download?id=1324825"
+            },
+            {
+                title: "بساتين عربستان - الجزء الرابع",
+                author: "أسامة المسلم",
+                category: "رواية فنتازيا",
+                pages: 380,
+                badge: "الجزء الرابع",
+                cover: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSjJlcQMttS497DYzpCUD6KFNxssThJ9RlYEBVjCXv0fv0DrIAz_VTKiAw-&s=10",
+                downloadLink: "https://mktbtypdf.com/download?id=1324881"
+            },
+            {
+                title: "بساتين عربستان - الجزء الخامس",
+                author: "اسامة المسلم",
+                category: "رواية فنتازيا",
+                pages: 507,
+                badge: "الجزء الخامس",
+                cover: "https://www.lpmarocaine.com/wp-content/uploads/2023/05/61kmadFeL._AC_UL600_SR600600_-e1684778846615.jpg",
+                downloadLink: "https://mktbtypdf.com/download?id=1324917"
+            },
+            {
+                title: "بساتين عربستان - الجزء السادس",
+                author: "اسامة المسلم",
+                category: "رواية فنتازيا",
+                pages: 643,
+                badge: "الجزء السادس",
+                cover: "https://i.pinimg.com/736x/14/27/b2/1427b2ef78d15b40d21338122357a98f.jpg",
+                downloadLink: "https://mktbtypdf.com/download?id=1324939"
+            },
+
+            // ============================================================
+            //  📚 سلسلة خوف - الجزء الثاني والثالث
+            // ============================================================
+            {
+                title: "خوف - الجزء الثاني",
+                author: "أسامة المسلم",
+                category: "رواية فنتازيا",
+                pages: 311,
+                badge: "الجزء الثاني",
+                cover: "https://atirbooks.com/wp-content/uploads/2025/08/%D8%AE%D9%88%D9%81-%D8%A7%D9%84%D8%AC%D8%B2%D8%A1-%D8%A7%D9%84%D8%AB%D8%A7%D9%86%D9%8A.jpg",
+                downloadLink: "https://mktbtypdf.com/download?id=khowf2"
+            },
+            {
+                title: "خوف - الجزء الثالث",
+                author: "أسامة المسلم",
+                category: "رواية فنتازيا",
+                pages: 311,
+                badge: "الجزء الثالث",
+                cover: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQMx4-vExP9NPqh9wiooH8Pg6y8PZR6L8__eb41lFChBUuc-7MPC4Rkoc0&s=10",
+                downloadLink: "https://mktbtypdf.com/download?id=khowf3"
+            },
+            {
+                title: "ملحمة البحور السبعة",
+                author: "اسامة المسلم",
+                category: "رواية فنتازيا",
+                pages: 513,
+                badge: "الجزا الاول",
+                cover: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcStE0M1DaGMW_xq0YPS8QugE9IAI6q5oGGmxw&s",
+                downloadLink: "https://mktbtypdf.com/download?id=1329295"
+            },
+            {
+                title: "ملحمة البحور السبعة",
+                author: "اسامة المسلم",
+                category: "رواية فنتازيا",
+                pages: 511,
+                badge: "الجزا التاني",
+                cover: "https://www.4readlib.com/uploads/images/zahef1677758659.png",
+                downloadLink: "https://mktbtypdf.com/download?id=1329320"
+            },
+            {
+                title: "ملحمة البحور السبعة",
+                author: "اسامة المسلم",
+                category: "رواية فنتازيا",
+                pages: 504,
+                badge: "الجزا التالت",
+                cover: "https://m.media-amazon.com/images/S/compressed.photo.goodreads.com/books/1525968436i/40095855.jpg",
+                downloadLink: "https://mktbtypdf.com/download?id=1329353"
+            },
+            {
+                title: "ملحمة البحور السبعة",
+                author: "اسامة المسلم",
+                category: "رواية فنتازيا",
+                pages: 509,
+                badge: "الجزا الرابع",
+                cover: "https://awraqonline.com/wp-content/uploads/2025/04/00bd13095d06c20b11a2993ca419d16b.jpg",
+                downloadLink: "https://mktbtypdf.com/download?id=1329408"
+            },
+            {
+                title: "ملحمة البحور السبعة",
+                author: "اسامة المسلم",
+                category: "رواية فنتازيا",
+                pages: 503,
+                badge: "الجزا الخامس",
+                cover: "https://m.media-amazon.com/images/S/compressed.photo.goodreads.com/books/1611568136i/56815715.jpg",
+                downloadLink: "https://mktbtypdf.com/download?id=1329432"
+            },
+
+            // ============================================================
+            //  📚 الكتب السابقة المضافة
+            // ============================================================
+            
+            
+            
+            {
+                title: "هدا ما حدت معي",
+                author: "أسامة المسلم",
+                category: "رواية",
+                pages: 442,
+                badge: "مميزة",
+                cover: "https://m.media-amazon.com/images/S/compressed.photo.goodreads.com/books/1628430092i/58725761.jpg",
+                downloadLink: "https://mktbtypdf.com/download?id=1324386"
+            },
+            {
+                title: "هدا ما حدت معها",
+                author: "أسامة المسلم",
+                category: "رواية",
+                pages: 248,
+                badge: "مميزة",
+                cover: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSFfOYDVNNVkf-MjJw9oiOjSTmsuBMikZNCEw&s",
+                downloadLink: "https://mktbtypdf.com/download?id=8705001"
+            },
+            {
+                title: "إني أتعفن رعباً",
+                author: "مريم الحيسي",
+                category: "رواية ",
+                pages: 151,
+                badge: "خيال",
+                cover: "https://cdn.abjjad.com/pub/aaaea91b-12eb-4512-a657-91c9bd8d3637.png",
+                downloadLink: "https://mktbtypdf.com/download?id=5785485"
+            },
+            {
+                title: "اكتب حتى لا ياكلني الشيطان - الجزء الأول",
+                author: "  مريم الحيسي",
+                category: "رواية خيال",
+                pages: 368,
+                badge: "الجزء الأول",
+                cover: "https://m.media-amazon.com/images/I/41XtpDjH3DL._AC_UF350,350_QL50_.jpg",
+                downloadLink: "https://mktbtypdf.com/download?id=7653412"
+            },
+            {
+                title: "اكتب حتى لا ياكلني الشيطان - الجزء الثاني",
+                author: "أحمد خالد توفيق",
+                category: "رواية رعب",
+                pages: 256,
+                badge: "الجزء الثاني",
+                cover: "https://mktbtypdf.com/wp-content/uploads/2026/01/%D8%A7%D9%83%D8%AA%D8%A8-%D8%AD%D8%AA%D9%89-%D9%84%D8%A7-%D8%A7%D8%B5%D8%A7%D8%A8-%D8%A8%D8%A7%D9%84%D8%AC%D9%86%D9%88%D9%86-pdf-%D9%85%D8%B1%D9%8A%D9%85-%D8%A7%D9%84%D8%AD%D9%8A%D8%B3%D9%8A-200x300.jpg",
+                downloadLink: "https://mktbtypdf.com/download?id=10545287"
+            },
+            {
+                title: "جمرة",
+                author:"دعاء الجدعاني",
+                category: "رواية رعب",
+                pages: 341,
+                badge: "رعب",
+                cover: "data:image/jpeg;base64,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",
+                downloadLink: "https://mktbtypdf.com/download?id=4846262"
+            },
+            {
+                title: "سفاح الأزقة",
+                author: "عثمان عابد",
+                category: "رواية ",
+                pages: 320,
+                badge: "تحقيق",
+                cover: "https://8ghrb.com/wp-content/uploads/2024/04/22-2.jpg",
+                downloadLink: "https://book-shadow.com/files/fhrst14/1102.pdf"
+            },
+            {
+                title: "الجزار",
+                author:  "حسن الجندي",
+                category: "رواية ",
+                pages: 330,
+                badge: "تشويق",
+                cover: "https://m.media-amazon.com/images/I/41p+doTDevL._AC_UF1000,1000_QL80_.jpg",
+                downloadLink: "https://foulabook.com/book/downloading/824655884"
+            },
+            // ======== الكتب السابقة ========
+            {
+                title: "بائع الورود",
+                author: "محمد صادق",
+                category: "رواية",
+                badge: "  رائع",
+                cover: "https://metaversepress.ae/wp-content/uploads/2023/02/%D8%A8%D8%A7%D8%A6%D8%B9-%D8%A7%D9%84%D9%88%D8%B1%D8%AF-01.jpg",
+                downloadLink: "https://www.alarabimag.com/download/book/?b=c0ff7eb96fd0a6173b2452f377235141"
+            },
+            {
+                title: "أرض زيكولا",
+                author: "عمرو عبد الحميد",
+                category: "رواية خيالية",
+                pages: 350,
+                badge: "خيال",
+                cover: "https://upload.wikimedia.org/wikipedia/ar/9/98/%D8%A3%D8%B1%D8%B6_%D8%B2%D9%8A%D9%83%D9%88%D9%84%D8%A7.jpg",
+                downloadLink: "https://mktbtypdf.com/download?id=662"
+            },
+            {
+                title: "موسم صيد الزنجور",
+                author: "إسماعيل غزالي",
+                category: "رواية",
+                pages: 436,
+                badge: "مميزة",
+                cover: "https://upload.wikimedia.org/wikipedia/ar/2/27/The-Season-of-Zangor-Fishin.jpg",
+                downloadLink: "https://foulabook.com/book/downloading/363684939"
+            },
+            {
+                title: "الرجل الذي فقد ظله",
+                author: "فتحي غانم",
+                category: "رواية فلسفية",
+                badge: "فلسفية",
+                cover: "https://media0103.elcinema.com/uploads/_320x_e865de14c838c2d19452fd81fdb66bb14b371ceb8743b93a53e17fe8f61718a3.jpg",
+                downloadLink: "https://mktbtypdf.com/download?id=1503002"
+            },
+            {
+                title: "نحو النور",
+                author: "ياسر برهامي",
+                category: "رواية",
+                badge: "ملهمة",
+                cover: "https://ebook.univeyes.com/wp-content/uploads/aqidah2_img/univeyes.aqidah.2.07839.jpg",
+                downloadLink: "https://ideology.univeyes.net/academy/doctrine00000/doctrine07001/doctrine07839.pdf"
+            },
+            {
+                title: "عزف منفرد",
+                author: "يوسف ادريس",
+                category: "رواية",
+                pages: 290,
+                badge: "رومانسي",
+                cover: "https://foulabook.com/storage/photo/42576.2018-10-04.1538684789.jpg",
+                downloadLink: "https://foulabook.com/book/downloading/805842726"
+            },
+            {
+                title: "بيت للورقة البيضاء",
+                author: "زكريا تامر",
+                category: "رواية",
+                pages: 240,
+                badge: "مميزة",
+                cover: "https://m.media-amazon.com/images/S/compressed.photo.goodreads.com/books/1314586306i/12463498.jpg",
+                downloadLink: "https://mktbtypdf.com/download?id=417414"
+            },
+            {
+                title: "أولاد حارتنا",
+                author: "نجيب محفوظ",
+                category: "رواية",
+                pages: 520,
+                badge: "جائزة نوبل",
+                cover: "https://m.media-amazon.com/images/S/compressed.photo.goodreads.com/books/1763764913i/2364284.jpg",
+                downloadLink: "https://foulabook.com/book/downloading/505031069"
+            },
+            {
+                title: "اللص والكلاب",
+                author: "نجيب محفوظ",
+                category: "رواية فلسفية",
+                pages: 210,
+                badge: "كلاسيكية",
+                cover: "https://upload.wikimedia.org/wikipedia/ar/5/53/%D8%A7%D9%84%D9%84%D8%B5_%D9%88%D8%A7%D9%84%D9%83%D9%84%D8%A7%D8%A8.jpg",
+                downloadLink: "https://foulabook.com/book/downloading/897210017"
+            },
+            {
+                title: "الحرافيش",
+                author: "نجيب محفوظ",
+                category: "رواية",
+                pages: 420,
+                badge: "كلاسيكية",
+                cover: "https://m.media-amazon.com/images/S/compressed.photo.goodreads.com/books/1347915841i/5295735.jpg",
+                downloadLink: "https://foulabook.com/book/downloading/424443832"
+            },
+            {
+                title: "زقاق المدق",
+                author: "نجيب محفوظ",
+                category: "رواية اجتماعية",
+                pages: 280,
+                badge: "شهيرة",
+                cover: "https://m.media-amazon.com/images/I/81avaSQ3ezL._UF1000,1000_QL80_.jpg",
+                downloadLink: "https://foulabook.com/book/downloading/749330901"
+            },
+            {
+                title: "مدرسة الحرية",
+                author: "شيشي بونروكو",
+                category: "رواية",
+                pages: 300,
+                badge: "سياسية",
+                cover: "https://m.media-amazon.com/images/S/compressed.photo.goodreads.com/books/1727531184i/13480617.jpg",
+                downloadLink: "https://foulabook.com/book/downloading/596777065"
+            },
+            {
+                title: "السكرية",
+                author: "نجيب محفوظ",
+                category: "رواية",
+                pages: 350,
+                badge: "ثلاثية",
+                cover: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSRhUAkkVnJBbrUnlGI1aPlZOAZ7iQhGrsvmA&s",
+                downloadLink: "https://foulabook.com/book/downloading/215601010"
+            },
+            {
+                title: "قصر الشوق",
+                author: "نجيب محفوظ",
+                category: "رواية",
+                pages: 320,
+                badge: "ثلاثية",
+                cover: "https://m.media-amazon.com/images/S/compressed.photo.goodreads.com/books/1632369819i/4591499.jpg",
+                downloadLink: "https://foulabook.com/book/downloading/388956173"
+            },
+            {
+                title: "الشحاذ",
+                author: "نجيب محفوظ",
+                category: "رواية",
+                pages: 250,
+                badge: "فلسفية",
+                cover: "https://www.kutubna.ae/cdn/shop/files/141725042.jpg?v=1699018863",
+                downloadLink: "https://foulabook.com/book/downloading/747800956"
+            },
+            {
+                title: "السمراء الهاربة",
+                author: "إيرل ستانلي جاردنر",
+                category: "رواية",
+                pages: 230,
+                badge: "الادب",
+                cover: "https://foulabook.com/storage/photo/78571.2021-06-18.1624034191.jpg",
+                downloadLink: "https://foulabook.com/book/downloading/777308414"
+            },
+            {
+                title: "الله والإنسان",
+                author: "مصطفى محمود",
+                category: "فلسفة",
+                pages: 200,
+                badge: "فلسفي",
+                cover: "https://m.media-amazon.com/images/I/51vEl5jlI0L._UF1000,1000_QL80_.jpg",
+                downloadLink: "https://foulabook.com/book/downloading/173880539"
+            },
+            {
+                title: "خوف",
+                author: "أسامة المسلم",
+                category: "فنتازيا",
+                pages: 220,
+                badge: "الجزا الاول",
+                cover: "https://m.media-amazon.com/images/I/41KCxxwkPDL._AC_UF1000,1000_QL80_.jpg",
+                downloadLink: "https://mktbtypdf.com/download?id=1329861"
+            },
+            {
+                title: "رحلتي من الشك إلى الإيمان",
+                author: "مصطفى محمود",
+                category: "فلسفة أديان",
+                pages: 180,
+                badge: "الأكثر قراءة",
+                cover: "https://www.alarabimag.com/images/thumbs/34831.jpg",
+                downloadLink: "https://foulabook.com/book/downloading/853958219"
+            },
+            {
+                title: "الكون والإنسان",
+                author: "فراس السواح",
+                category: "تأملات",
+                pages: 240,
+                badge: "علمي",
+                cover: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTME_oAefUYzkNLSb1WR5itmr_5cisFl1yGTg&s",
+                downloadLink: "https://foulabook.com/book/downloading/569921946"
+            },
+            {
+                title: "المسيخ الدجال",
+                author: "مصطفى محمود",
+                category: "فلسفة",
+                pages: 190,
+                badge: "فكري",
+                cover: "https://assets.asfar.io/uploads/2024/01/19021431/almasikh-addajjal-book-mustafa-mahmoud.jpg",
+                downloadLink: "https://foulabook.com/book/downloading/882887820"
+            },
+            {
+                title: "الروح والجسد",
+                author: "مصطفى محمود",
+                category: "فلسفة",
+                pages: 210,
+                badge: "فلسفي",
+                cover: "https://m.media-amazon.com/images/I/51YCjlDwnoL._AC_UF1000,1000_QL80_.jpg",
+                downloadLink: "https://foulabook.com/book/downloading/204967107"
+            },
+            {
+                title: "الوجود والعدم",
+                author: "مصطفى محمود",
+                category: "فلسفة",
+                pages: 170,
+                badge: "وجودية",
+                cover: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQQ1qPM9uOJHqodMeJkVI-IrW92UArHyUoc6g&s",
+                downloadLink: "https://foulabook.com/book/downloading/120786829"
+            },
+            {
+                title: "النبي",
+                author: "جبران خليل جبران",
+                category: "أدب فلسفي",
+                pages: 120,
+                badge: "خالد",
+                cover: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQJizekT3NYvF2GOwKl0HdFIGTUUzG1BNPLpw&s",
+                downloadLink: "https://www.alarabimag.com/download/book/?b=c3fa7bb264d0a6173b2453f271205747"
+            },
+            {
+                title: "الأجنحة المتكسرة",
+                author: "جبران خليل جبران",
+                category: "رواية فلسفية",
+                pages: 140,
+                badge: "شاعرية",
+                cover: "https://example.com/covers/agniha.jpg",
+                downloadLink: "https://www.alarabimag.com/download/book/?b=c3fa7ab960d0a6173b2453f271205c46"
+            },
+            {
+                title: "رمل وزبد",
+                author: "جبران خليل جبران",
+                category: "أدب فلسفي",
+                pages: 100,
+                badge: "خواطر",
+                cover: "https://example.com/covers/raml.jpg",
+                downloadLink: "https://foulabook.com/book/downloading/808860556"
+            },
+           
+            {
+                title: "عرائس المروج",
+                author: "جبران خليل جبران",
+                category: "أدب فلسفي",
+                pages: 130,
+                badge: "شعرية",
+                cover: "https://example.com/covers/arayes.jpg",
+                downloadLink: "https://foulabook.com/book/downloading/157875636"
+            },
+            {
+                title: "1984",
+                author: "جورج أورويل",
+                category: "رواية ديستوبيا",
+                pages: 328,
+                badge: "تحميل شهير",
+                cover: "https://example.com/covers/1984.jpg",
+                downloadLink: "https://www.bookleaks.com/files/fhrst1/494.pdf"
+            },
+            {
+                title: "مزرعة الحيوان",
+                author: "جورج أورويل",
+                category: "رواية سياسية",
+                pages: 140,
+                badge: "كلاسيكية",
+                cover: "https://example.com/covers/mazraa.jpg",
+                downloadLink: "https://foulabook.com/book/downloading/409117838"
+            },
+            {
+                title: "الجريمة والعقاب",
+                author: "فيودور دوستويفسكي",
+                category: "رواية نفسية",
+                pages: 560,
+                badge: "كلاسيكية",
+                cover: "https://example.com/covers/jarima.jpg",
+                downloadLink: "https://www.reyadbooks.com/dl/?id=1299"
+            },
+            {
+                title: "البؤساء",
+                author: "فيكتور هوغو",
+                category: "رواية ملحمية",
+                pages: 1200,
+                badge: "ضخمة",
+                cover: "https://example.com/covers/boasa.jpg",
+                downloadLink: "https://foulabook.com/book/downloading/955539315"
+            },
+            {
+                title: "مئة عام من العزلة",
+                author: "غابرييل غارسيا ماركيز",
+                category: "واقعية سحرية",
+                pages: 450,
+                badge: "جائزة نوبل",
+                cover: "https://example.com/covers/mea.jpg",
+                downloadLink: "https://www.alarabimag.com/download/23145-pdf"
+            },
+            {
+                title: "الأمير",
+                author: "نيكولو مكيافيلي",
+                category: "فلسفة سياسية",
+                pages: 150,
+                badge: "كلاسيكية",
+                cover: "https://example.com/covers/amir.jpg",
+                downloadLink: "https://foulabook.com/book/downloading/616749031"
+            },
+            {
+                title: "الغريب",
+                author: "ألبير كامو",
+                category: "رواية فلسفية",
+                pages: 120,
+                badge: "فلسفية",
+                cover: "https://example.com/covers/gharib.jpg",
+                downloadLink: "https://foulabook.com/book/downloading/575657363"
+            },
+            {
+                title: "كبرياء وتحامل",
+                author: "جين أوستن",
+                category: "رواية رومانسية",
+                pages: 400,
+                badge: "كلاسيكية",
+                cover: "https://example.com/covers/kibriya.jpg",
+                downloadLink: "https://docs.google.com/uc?export=download&id=1dE3kIgUQRnw4o9gFg8VZDAVyaLCOu-0e"
+            },
+            {
+                title: "قصة مدينتين",
+                author: "تشارلز ديكنز",
+                category: "رواية تاريخية",
+                pages: 380,
+                badge: "كلاسيكية",
+                cover: "https://example.com/covers/qissa.jpg",
+                downloadLink: "https://foulabook.com/book/downloading/692807594"
+            },
+            {
+                title: "آمال كبرى",
+                author: "تشارلز ديكنز",
+                category: "رواية",
+                pages: 450,
+                badge: "كلاسيكية",
+                cover: "https://example.com/covers/amal.jpg",
+                downloadLink: "https://foulabook.com/book/downloading/564211663"
+            },
+            {
+                title: "جين إير",
+                author: "شارلوت برونتي",
+                category: "رواية رومانسية",
+                pages: 380,
+                badge: "كلاسيكية",
+                cover: "https://example.com/covers/jane.jpg",
+                downloadLink: "https://foulabook.com/book/downloading/675154448"
+            },
+            {
+                title: "مرتفعات ويذرنغ",
+                author: "إيميلي برونتي",
+                category: "رواية رومانسية",
+                pages: 350,
+                badge: "كلاسيكية",
+                cover: "https://example.com/covers/murt.jpg",
+                downloadLink: "https://foulabook.com/book/downloading/832076328"
+            },
+            {
+                title: "فرانكشتاين",
+                author: "ماري شيلي",
+                category: "رواية رعب",
+                pages: 280,
+                badge: "كلاسيكية",
+                cover: "https://example.com/covers/frank.jpg",
+                downloadLink: "http://www.bookleaks.com/files/fhrst4/231.pdf"
+            },
+            {
+                title: "دراكولا",
+                author: "برام ستوكر",
+                category: "رواية رعب",
+                pages: 400,
+                badge: "كلاسيكية",
+                cover: "https://example.com/covers/dracula.jpg",
+                downloadLink: "https://foulabook.com/book/downloading/634913701"
+            },
+            {
+                title: "موبي ديك",
+                author: "هرمان ملفيل",
+                category: "رواية مغامرات",
+                pages: 600,
+                badge: "كلاسيكية",
+                cover: "https://example.com/covers/moby.jpg",
+                downloadLink: "https://foulabook.com/book/downloading/191867841"
+            },
+            {
+                title: "جزيرة الكنز",
+                author: "روبرت لويس ستيفنسون",
+                category: "رواية مغامرات",
+                pages: 250,
+                badge: "مغامرة",
+                cover: "https://example.com/covers/jazira.jpg",
+                downloadLink: "https://foulabook.com/book/downloading/407169722"
+            },
+            {
+                title: "المسخ",
+                author: "فرانز كافكا",
+                category: "رواية فلسفية",
+                pages: 80,
+                badge: "فلسفية",
+                cover: "https://example.com/covers/masakh.jpg",
+                downloadLink: "https://foulabook.com/book/downloading/689778119"
+            },
+            {
+                title: "الأوديسة",
+                author: "هوميروس",
+                category: "ملحمة",
+                pages: 450,
+                badge: "كلاسيكية",
+                cover: "https://example.com/covers/odyssey.jpg",
+                downloadLink: "https://foulabook.com/book/downloading/282661638"
+            }
+        ];
+
+        // ================================================================
+        //  عرض الكتب
+        // ================================================================
+
+        const booksGrid = document.getElementById('booksGrid');
+        const searchInput = document.getElementById('searchInput');
+        const searchBtn = document.getElementById('searchBtn');
+        const filterTags = document.querySelectorAll('.filter-tag');
+
+        let currentFilter = 'all';
+        let currentSearch = '';
+
+        function getUniqueAuthors() {
+            const authors = new Set(allBooks.map(b => b.author));
+            return authors.size;
+        }
+
+        document.getElementById('bookCount').textContent = allBooks.length;
+        document.getElementById('authorCount').textContent = getUniqueAuthors();
+
+        function renderBooks() {
+            const filtered = allBooks.filter(book => {
+                if (currentFilter !== 'all') {
+                    if (currentFilter === 'عالمية') {
+                        const worldAuthors = ['جورج أورويل', 'فيودور دوستويفسكي', 'فيكتور هوغو', 'غابرييل غارسيا ماركيز',
+                            'نيكولو مكيافيلي', 'ألبير كامو', 'جين أوستن', 'تشارلز ديكنز', 'شارلوت برونتي',
+                            'إيميلي برونتي', 'ماري شيلي', 'برام ستوكر', 'هرمان ملفيل', 'روبرت لويس ستيفنسون',
+                            'فرانز كافكا', 'هوميروس'];
+                        if (!worldAuthors.includes(book.author)) return false;
+                    } else if (book.author !== currentFilter) {
+                        return false;
+                    }
+                }
+
+                if (currentSearch) {
+                    const search = currentSearch.toLowerCase();
+                    const matchTitle = book.title.toLowerCase().includes(search);
+                    const matchAuthor = book.author.toLowerCase().includes(search);
+                    const matchCategory = book.category.toLowerCase().includes(search);
+                    if (!matchTitle && !matchAuthor && !matchCategory) return false;
+                }
+
+                return true;
+            });
+
+            booksGrid.innerHTML = '';
+
+            if (filtered.length === 0) {
+                booksGrid.innerHTML = `
+                    <div class="no-results">
+                        <i class="fas fa-book-open"></i>
+                        <p>😅 لا توجد نتائج مطابقة</p>
+                        <p style="font-size: 16px; color: #5a5a7a;">حاول تغيير البحث أو التصفية</p>
+                    </div>
+                `;
+                return;
+            }
+
+            filtered.forEach(book => {
+                const card = document.createElement('div');
+                card.className = 'book-card';
+
+                const cover = document.createElement('div');
+                cover.className = 'book-cover';
+
+                if (book.badge) {
+                    const badge = document.createElement('span');
+                    badge.className = 'badge';
+                    badge.textContent = book.badge;
+                    cover.appendChild(badge);
+                }
+
+                // عرض صورة الغلاف إذا كانت موجودة
+                if (book.cover && book.cover !== 'https://example.com/covers/') {
+                    const img = document.createElement('img');
+                    img.src = book.cover;
+                    img.alt = book.title;
+                    img.onerror = function() {
+                        // إذا فشل تحميل الصورة، استخدم الأيقونة
+                        this.style.display = 'none';
+                        const icon = document.createElement('i');
+                        icon.className = `fas ${book.icon || 'fa-book'} book-icon`;
+                        cover.appendChild(icon);
+                    };
+                    cover.appendChild(img);
+                } else {
+                    const icon = document.createElement('i');
+                    icon.className = `fas ${book.icon || 'fa-book'} book-icon`;
+                    cover.appendChild(icon);
+                }
+
+                card.appendChild(cover);
+
+                const title = document.createElement('div');
+                title.className = 'book-title';
+                title.textContent = book.title;
+                card.appendChild(title);
+
+                const author = document.createElement('div');
+                author.className = 'book-author';
+                author.innerHTML = `<i class="fas fa-pen-fancy"></i> ${book.author}`;
+                card.appendChild(author);
+
+                const meta = document.createElement('div');
+                meta.className = 'book-meta';
+                meta.innerHTML = `
+                    <span><i class="fas fa-tag"></i> ${book.category}</span>
+                    <span><i class="fas fa-file-pdf"></i> ${book.pages} صفحة</span>
+                `;
+                card.appendChild(meta);
+
+                const btnGroup = document.createElement('div');
+                btnGroup.className = 'btn-group';
+
+                const downloadBtn = document.createElement('button');
+                downloadBtn.className = 'btn-download';
+                downloadBtn.innerHTML = `<i class="fas fa-download"></i> تحميل PDF`;
+                downloadBtn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    e.preventDefault();
+                    if (book.downloadLink && book.downloadLink !== 'https://example.com/book.pdf') {
+                        const win = window.open(book.downloadLink, '_blank');
+                        if (!win) window.location.href = book.downloadLink;
+                        showToast(`✅ جاري تحميل "${book.title}" ...`);
+                    } else {
+                        showToast(`❌ رابط التحميل غير متوفر لهذا الكتاب`);
+                    }
+                });
+                btnGroup.appendChild(downloadBtn);
+
+                card.appendChild(btnGroup);
+                booksGrid.appendChild(card);
+            });
+        }
+
+        filterTags.forEach(tag => {
+            tag.addEventListener('click', function() {
+                filterTags.forEach(t => t.classList.remove('active'));
+                this.classList.add('active');
+                currentFilter = this.dataset.filter;
+                renderBooks();
+            });
+        });
+
+        searchBtn.addEventListener('click', function() {
+            currentSearch = searchInput.value.trim();
+            renderBooks();
+        });
+
+        searchInput.addEventListener('keyup', function(e) {
+            if (e.key === 'Enter') {
+                currentSearch = this.value.trim();
+                renderBooks();
+            }
+        });
+
+        const toast = document.getElementById('toast');
+        const toastMessage = document.getElementById('toastMessage');
+        let toastTimeout = null;
+
+        function showToast(message) {
+            toastMessage.textContent = message;
+            toast.classList.add('show');
+            if (toastTimeout) clearTimeout(toastTimeout);
+            toastTimeout = setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+
+        renderBooks();
+
+        setTimeout(() => {
+            showToast(`📚 مرحباً! ${allBooks.length} كتاباً بانتظارك`);
+        }, 500);
+
+    })();
+</script>
+
+</body>
+</html>
